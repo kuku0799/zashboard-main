@@ -6,14 +6,19 @@ import {
   defaultOpenClashNodeServerBaseUrl,
   deleteOpenClashNodes,
   listOpenClashNodes,
+  updateOpenClashNodeServerScript,
   type OpenClashNodeInfo,
 } from '@/api/openclashNodeServer'
-import { emptyManualDraft, manualDraftToNode, type ManualNodeDraft } from '@/helper/openclashManualNode'
 import { renderGroups } from '@/composables/proxies'
 import { useCtrlsBar } from '@/composables/useCtrlsBar'
 import { PROXY_SORT_TYPE, PROXY_TAB_TYPE, ROUTE_NAME, SETTINGS_MENU_KEY } from '@/constant'
-import { getMinCardWidth } from '@/helper/utils'
 import { showNotification } from '@/helper/notification'
+import {
+  emptyManualDraft,
+  manualDraftToNode,
+  type ManualNodeDraft,
+} from '@/helper/openclashManualNode'
+import { getMinCardWidth } from '@/helper/utils'
 import { configs, updateConfigs } from '@/store/config'
 import { activeConnections } from '@/store/connections'
 import {
@@ -70,6 +75,7 @@ export default defineComponent({
       localStorage.getItem('openclashNodeServer/baseUrl') || defaultOpenClashNodeServerBaseUrl(),
     )
     const nodeServerLoading = ref(false)
+    const nodeServerUpdating = ref(false)
     const nodeServerNodes = ref<OpenClashNodeInfo[]>([])
     const selectedNodeNames = ref<string[]>([])
     const addUrlsText = ref('')
@@ -213,9 +219,9 @@ export default defineComponent({
       if (tab === 'delete') {
         try {
           await refreshNodeServerNodes()
-        } catch (e: any) {
+        } catch (e: unknown) {
           showNotification({
-            content: String(e?.message || e),
+            content: errorMessage(e),
             type: 'alert-error',
           })
         }
@@ -229,13 +235,18 @@ export default defineComponent({
         .filter(Boolean)
     }
 
-    const formatNodeServerError = (e: any) => {
-      const data = e?.response?.data
+    const errorMessage = (e: unknown) => {
+      return String((e as { message?: string })?.message || e)
+    }
+
+    const formatNodeServerError = (e: unknown) => {
+      const data = (e as { response?: { data?: { parse_errors?: string[]; error?: string } } })
+        ?.response?.data
       const parseErrors =
         Array.isArray(data?.parse_errors) && data.parse_errors.length
           ? `\n${data.parse_errors.slice(0, 5).join('\n')}`
           : ''
-      return String(data?.error || e?.message || e) + parseErrors
+      return String(data?.error || errorMessage(e)) + parseErrors
     }
 
     const handleAddByUrls = async () => {
@@ -269,7 +280,7 @@ export default defineComponent({
         setTimeout(() => {
           fetchProxies()
         }, 1200)
-      } catch (e: any) {
+      } catch (e: unknown) {
         showNotification({
           content: formatNodeServerError(e),
           type: 'alert-error',
@@ -283,7 +294,7 @@ export default defineComponent({
     const handleAddBySubscriptionUrl = async () => {
       const subUrl = addSubscriptionUrl.value.trim()
       if (!subUrl) {
-        showNotification({ content: '订阅链接为空', type: 'alert-warning' })
+        showNotification({ content: '??????', type: 'alert-warning' })
         return
       }
       nodeServerLoading.value = true
@@ -292,11 +303,13 @@ export default defineComponent({
         persistNodeServerBaseUrl()
         const res = await addOpenClashNodesByUrls(nodeServerBaseUrl.value.trim(), [subUrl])
         if (!res.ok) {
-          const detail = res.parse_errors?.length ? `\n${res.parse_errors.slice(0, 5).join('\n')}` : ''
+          const detail = res.parse_errors?.length
+            ? `\n${res.parse_errors.slice(0, 5).join('\n')}`
+            : ''
           throw new Error((res.error || 'import subscription failed') + detail)
         }
         showNotification({
-          content: `订阅导入完成: injected ${res.injected ?? 0}, invalid ${res.skipped_invalid ?? 0}, dup ${res.skipped_duplicate ?? 0}`,
+          content: `??????: injected ${res.injected ?? 0}, invalid ${res.skipped_invalid ?? 0}, dup ${res.skipped_duplicate ?? 0}`,
           type: 'alert-success',
           timeout: 4000,
         })
@@ -305,7 +318,7 @@ export default defineComponent({
         setTimeout(() => {
           fetchProxies()
         }, 1200)
-      } catch (e: any) {
+      } catch (e: unknown) {
         showNotification({
           content: formatNodeServerError(e),
           type: 'alert-error',
@@ -344,9 +357,9 @@ export default defineComponent({
         setTimeout(() => {
           fetchProxies()
         }, 1200)
-      } catch (e: any) {
+      } catch (e: unknown) {
         showNotification({
-          content: String(e?.message || e),
+          content: errorMessage(e),
           type: 'alert-error',
           timeout: 5000,
         })
@@ -359,22 +372,18 @@ export default defineComponent({
       const tr = chainTransitName.value.trim()
       const ex = chainExitName.value.trim()
       if (!tr || !ex) {
-        showNotification({ content: '请选择中转与落地节点', type: 'alert-warning' })
+        showNotification({ content: '??????????', type: 'alert-warning' })
         return
       }
       if (tr === ex) {
-        showNotification({ content: '中转与落地不能相同', type: 'alert-warning' })
+        showNotification({ content: '?????????', type: 'alert-warning' })
         return
       }
       if (!chainApplyRelay.value && !chainApplyDialer.value) {
-        showNotification({ content: '请至少选择一种应用方式', type: 'alert-warning' })
+        showNotification({ content: '???????????', type: 'alert-warning' })
         return
       }
-      const mode = chainApplyRelay.value
-        ? chainApplyDialer.value
-          ? 'both'
-          : 'relay'
-        : 'dialer'
+      const mode = chainApplyRelay.value ? (chainApplyDialer.value ? 'both' : 'relay') : 'dialer'
       nodeServerLoading.value = true
       try {
         persistNodeServerBaseUrl()
@@ -387,12 +396,12 @@ export default defineComponent({
         showNotification({
           content:
             mode === 'both'
-              ? 'relay 组与 dialer-proxy 已应用'
+              ? 'relay ?? dialer-proxy ???'
               : mode === 'relay'
-                ? 'relay 组已应用'
+                ? 'relay ????'
                 : res.dialer_applied
-                  ? 'dialer-proxy 已写入'
-                  : '请求已提交',
+                  ? 'dialer-proxy ???'
+                  : '?????',
           type: 'alert-success',
           timeout: 4000,
         })
@@ -408,9 +417,9 @@ export default defineComponent({
         setTimeout(() => {
           fetchProxies()
         }, 1200)
-      } catch (e: any) {
+      } catch (e: unknown) {
         showNotification({
-          content: String(e?.message || e),
+          content: errorMessage(e),
           type: 'alert-error',
           timeout: 5000,
         })
@@ -440,14 +449,37 @@ export default defineComponent({
         setTimeout(() => {
           fetchProxies()
         }, 1200)
-      } catch (e: any) {
+      } catch (e: unknown) {
         showNotification({
-          content: String(e?.message || e),
+          content: errorMessage(e),
           type: 'alert-error',
           timeout: 5000,
         })
       } finally {
         nodeServerLoading.value = false
+      }
+    }
+
+    const handleUpdateNodeServerScript = async () => {
+      if (nodeServerUpdating.value) return
+      nodeServerUpdating.value = true
+      try {
+        persistNodeServerBaseUrl()
+        const res = await updateOpenClashNodeServerScript(nodeServerBaseUrl.value.trim())
+        if (!res.ok) throw new Error(res.error || 'update script failed')
+        showNotification({
+          content: res.message || 'Script updated. Restart node server process to apply.',
+          type: 'alert-success',
+          timeout: 5000,
+        })
+      } catch (e: unknown) {
+        showNotification({
+          content: errorMessage(e),
+          type: 'alert-error',
+          timeout: 5000,
+        })
+      } finally {
+        nodeServerUpdating.value = false
       }
     }
 
@@ -678,15 +710,17 @@ export default defineComponent({
             boxClass="max-w-xl w-[min(100vw-1rem,36rem)]"
           >
             <div class="flex flex-col gap-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-sm">
-              <section class="rounded-box border border-base-300/30 bg-base-200/35 p-2.5 shadow-sm">
-                <div class="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-base-content/50">
+              <section class="rounded-box border-base-300/30 bg-base-200/35 border p-2.5 shadow-sm">
+                <div class="text-base-content/50 mb-1.5 text-[11px] font-medium tracking-wide uppercase">
                   Node server
                 </div>
-                <div class="join join-vertical w-full min-w-0 sm:join-horizontal">
+                <div class="join join-vertical sm:join-horizontal w-full min-w-0">
                   <input
                     class="input input-bordered input-sm join-item min-h-11 w-full min-w-0 flex-1 sm:min-h-9"
                     value={nodeServerBaseUrl.value}
-                    onInput={(e) => (nodeServerBaseUrl.value = (e.target as HTMLInputElement).value)}
+                    onInput={(e) =>
+                      (nodeServerBaseUrl.value = (e.target as HTMLInputElement).value)
+                    }
                     onBlur={() => persistNodeServerBaseUrl()}
                     placeholder={defaultOpenClashNodeServerBaseUrl()}
                     aria-label="OpenClash node server base URL"
@@ -694,7 +728,7 @@ export default defineComponent({
                   <button
                     type="button"
                     class="btn btn-neutral btn-sm join-item min-h-11 px-4 sm:min-h-9"
-                    disabled={nodeServerLoading.value}
+                    disabled={nodeServerLoading.value || nodeServerUpdating.value}
                     onClick={() => refreshNodeServerNodes().catch(() => {})}
                     aria-label="Test connection to node server"
                   >
@@ -702,6 +736,19 @@ export default defineComponent({
                       <span class="loading loading-spinner loading-xs"></span>
                     ) : (
                       'Test'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm join-item min-h-11 px-4 sm:min-h-9"
+                    disabled={nodeServerLoading.value || nodeServerUpdating.value}
+                    onClick={() => handleUpdateNodeServerScript()}
+                    aria-label="Update openclash_node_server_stable.py"
+                  >
+                    {nodeServerUpdating.value ? (
+                      <span class="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      'Update Script'
                     )}
                   </button>
                 </div>
@@ -747,7 +794,7 @@ export default defineComponent({
                       ]}
                       onClick={() => (addMode.value = 'url')}
                     >
-                      URL 导入
+                      URL ??
                     </a>
                     <a
                       role="tab"
@@ -757,7 +804,7 @@ export default defineComponent({
                       ]}
                       onClick={() => (addMode.value = 'manual')}
                     >
-                      手动填写
+                      ????
                     </a>
                     <a
                       role="tab"
@@ -770,13 +817,13 @@ export default defineComponent({
                         refreshNodeServerNodes().catch(() => {})
                       }}
                     >
-                      链式代理
+                      ????
                     </a>
                   </div>
                   {addMode.value === 'url' ? (
                     <>
-                      <div class="rounded-box border border-base-300/40 bg-base-200/40 p-2">
-                        <div class="mb-1 text-xs text-base-content/70">机场订阅链接</div>
+                      <div class="rounded-box border-base-300/40 bg-base-200/40 border p-2">
+                        <div class="text-base-content/70 mb-1 text-xs">??????</div>
                         <div class="join w-full">
                           <input
                             class="input input-bordered input-sm join-item flex-1"
@@ -792,15 +839,17 @@ export default defineComponent({
                             disabled={nodeServerLoading.value}
                             onClick={() => handleAddBySubscriptionUrl()}
                           >
-                            导入订阅
+                            ????
                           </button>
                         </div>
                       </div>
                       <textarea
                         class="textarea textarea-bordered min-h-32 w-full text-sm"
                         value={addUrlsText.value}
-                        onInput={(e) => (addUrlsText.value = (e.target as HTMLTextAreaElement).value)}
-                        placeholder={'每行一条链接\nvless://… / vmess://… / ss://…'}
+                        onInput={(e) =>
+                          (addUrlsText.value = (e.target as HTMLTextAreaElement).value)
+                        }
+                        placeholder={'??????\nvless://? / vmess://? / ss://?'}
                         aria-label="Subscription URLs, one per line"
                       ></textarea>
                       <button
@@ -812,7 +861,7 @@ export default defineComponent({
                         {nodeServerLoading.value ? (
                           <span class="loading loading-spinner loading-sm"></span>
                         ) : (
-                          '添加'
+                          '??'
                         )}
                       </button>
                     </>
@@ -831,18 +880,17 @@ export default defineComponent({
                         {nodeServerLoading.value ? (
                           <span class="loading loading-spinner loading-sm"></span>
                         ) : (
-                          '添加'
+                          '??'
                         )}
                       </button>
                     </>
                   ) : (
                     <>
-                      <p class="text-xs text-base-content/60">
-                        从配置中已有 proxies 选择中转和落地。可分别控制写入 relay 组与
-                        dialer-proxy。
+                      <p class="text-base-content/60 text-xs">
+                        ?????? proxies ??????????????? relay ?? dialer-proxy?
                       </p>
-                      <div class="rounded-box border border-base-300/40 bg-base-200/40 p-2">
-                        <div class="mb-2 text-xs text-base-content/70">应用方式</div>
+                      <div class="rounded-box border-base-300/40 bg-base-200/40 border p-2">
+                        <div class="text-base-content/70 mb-2 text-xs">????</div>
                         <label class="mb-2 flex items-center gap-2 text-sm">
                           <input
                             class="checkbox checkbox-sm"
@@ -852,7 +900,7 @@ export default defineComponent({
                               (chainApplyRelay.value = (e.target as HTMLInputElement).checked)
                             }
                           />
-                          <span>写入 relay 组</span>
+                          <span>?? relay ?</span>
                         </label>
                         <label class="flex items-center gap-2 text-sm">
                           <input
@@ -863,23 +911,27 @@ export default defineComponent({
                               (chainApplyDialer.value = (e.target as HTMLInputElement).checked)
                             }
                           />
-                          <span>写入 dialer-proxy</span>
+                          <span>?? dialer-proxy</span>
                         </label>
                       </div>
                       <div class="flex flex-col gap-1">
-                        <span class="text-xs text-base-content/70">中转</span>
+                        <span class="text-base-content/70 text-xs">??</span>
                         <input
                           class="input input-bordered input-sm"
                           value={chainTransitFilter.value}
-                          onInput={(e) => (chainTransitFilter.value = (e.target as HTMLInputElement).value)}
-                          placeholder="筛选名称…"
+                          onInput={(e) =>
+                            (chainTransitFilter.value = (e.target as HTMLInputElement).value)
+                          }
+                          placeholder="?????"
                         />
                         <select
                           class="select select-bordered select-sm w-full"
                           value={chainTransitName.value}
-                          onChange={(e) => (chainTransitName.value = (e.target as HTMLSelectElement).value)}
+                          onChange={(e) =>
+                            (chainTransitName.value = (e.target as HTMLSelectElement).value)
+                          }
                         >
-                          <option value="">选择中转节点</option>
+                          <option value="">??????</option>
                           {filteredForChainTransit.value.map((n) => (
                             <option
                               key={`t-${n.name}`}
@@ -892,19 +944,23 @@ export default defineComponent({
                         </select>
                       </div>
                       <div class="flex flex-col gap-1">
-                        <span class="text-xs text-base-content/70">落地</span>
+                        <span class="text-base-content/70 text-xs">??</span>
                         <input
                           class="input input-bordered input-sm"
                           value={chainExitFilter.value}
-                          onInput={(e) => (chainExitFilter.value = (e.target as HTMLInputElement).value)}
-                          placeholder="筛选名称…"
+                          onInput={(e) =>
+                            (chainExitFilter.value = (e.target as HTMLInputElement).value)
+                          }
+                          placeholder="?????"
                         />
                         <select
                           class="select select-bordered select-sm w-full"
                           value={chainExitName.value}
-                          onChange={(e) => (chainExitName.value = (e.target as HTMLSelectElement).value)}
+                          onChange={(e) =>
+                            (chainExitName.value = (e.target as HTMLSelectElement).value)
+                          }
                         >
-                          <option value="">选择落地节点</option>
+                          <option value="">??????</option>
                           {filteredForChainExit.value.map((n) => (
                             <option
                               key={`e-${n.name}`}
@@ -925,7 +981,7 @@ export default defineComponent({
                         {nodeServerLoading.value ? (
                           <span class="loading loading-spinner loading-sm"></span>
                         ) : (
-                          '应用链式代理'
+                          '??????'
                         )}
                       </button>
                     </>
@@ -942,7 +998,7 @@ export default defineComponent({
                       {lastAddResult.value.parse_errors?.length ? (
                         <div class="alert alert-warning text-sm shadow-none">
                           <div class="mb-1 text-xs font-medium">parse_errors</div>
-                          <div class="max-h-36 overflow-y-auto rounded-md bg-base-100/50 p-2 font-mono text-xs whitespace-pre-wrap break-all">
+                          <div class="bg-base-100/50 max-h-36 overflow-y-auto rounded-md p-2 font-mono text-xs break-all whitespace-pre-wrap">
                             {lastAddResult.value.parse_errors.join('\n')}
                           </div>
                         </div>
@@ -953,7 +1009,7 @@ export default defineComponent({
               ) : (
                 <div class="flex flex-col gap-4">
                   <div class="flex items-center justify-between gap-2">
-                    <div class="text-xs font-medium text-base-content/70">
+                    <div class="text-base-content/70 text-xs font-medium">
                       Nodes ({nodeServerNodes.value.length})
                     </div>
                     <button
@@ -970,9 +1026,9 @@ export default defineComponent({
                       )}
                     </button>
                   </div>
-                  <div class="max-h-[min(50vh,18rem)] overflow-y-auto rounded-box border border-base-300/40 bg-base-200/50 p-2 sm:max-h-72">
+                  <div class="rounded-box border-base-300/40 bg-base-200/50 max-h-[min(50vh,18rem)] overflow-y-auto border p-2 sm:max-h-72">
                     {nodeServerNodes.value.length === 0 ? (
-                      <div class="py-4 text-center text-sm text-base-content/50">empty</div>
+                      <div class="text-base-content/50 py-4 text-center text-sm">empty</div>
                     ) : (
                       <div class="flex flex-col">
                         {nodeServerNodes.value.map((n) => {
@@ -980,7 +1036,7 @@ export default defineComponent({
                           return (
                             <label
                               key={n.name}
-                              class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 active:bg-base-300/30 sm:min-h-9"
+                              class="active:bg-base-300/30 flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 sm:min-h-9"
                             >
                               <input
                                 type="checkbox"

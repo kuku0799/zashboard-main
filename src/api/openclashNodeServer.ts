@@ -31,6 +31,17 @@ type DeleteNodesResponse = {
   error?: string
 }
 
+type UpdateSelfScriptResponse = {
+  ok: boolean
+  updated?: boolean
+  script_url?: string
+  script_path?: string
+  backup_path?: string
+  need_restart?: boolean
+  message?: string
+  error?: string
+}
+
 export type ChainProxyMode = 'relay' | 'dialer' | 'both'
 
 export type AddChainRequest = {
@@ -76,20 +87,23 @@ export const addOpenClashNodesByUrls = async (baseUrl: string, urls: string[]) =
   try {
     const { data } = await client.post<AddNodesResponse>('/add-nodes', { urls })
     return data
-  } catch (e: any) {
-    if (e?.response?.data) return e.response.data as AddNodesResponse
+  } catch (e: unknown) {
+    if (axios.isAxiosError<AddNodesResponse>(e) && e.response?.data) return e.response.data
     throw e
   }
 }
 
 /** 手动填写的节点 JSON，与 openclash_node_server_stable.py 的 to_clash_node 一致 */
-export const addOpenClashNodesByNodes = async (baseUrl: string, nodes: Record<string, unknown>[]) => {
+export const addOpenClashNodesByNodes = async (
+  baseUrl: string,
+  nodes: Record<string, unknown>[],
+) => {
   const client = createClient(baseUrl)
   try {
     const { data } = await client.post<AddNodesResponse>('/add-nodes', { nodes })
     return data
-  } catch (e: any) {
-    if (e?.response?.data) return e.response.data as AddNodesResponse
+  } catch (e: unknown) {
+    if (axios.isAxiosError<AddNodesResponse>(e) && e.response?.data) return e.response.data
     throw e
   }
 }
@@ -97,6 +111,13 @@ export const addOpenClashNodesByNodes = async (baseUrl: string, nodes: Record<st
 export const deleteOpenClashNodes = async (baseUrl: string, node_names: string[]) => {
   const client = createClient(baseUrl)
   const { data } = await client.post<DeleteNodesResponse>('/delete-nodes', { node_names })
+  return data
+}
+
+export const updateOpenClashNodeServerScript = async (baseUrl: string, script_url?: string) => {
+  const client = createClient(baseUrl)
+  const payload = script_url?.trim() ? { script_url: script_url.trim() } : {}
+  const { data } = await client.post<UpdateSelfScriptResponse>('/update-self-script', payload)
   return data
 }
 
@@ -113,13 +134,13 @@ export const addOpenClashChainProxy = async (baseUrl: string, body: AddChainRequ
   try {
     const { data } = await client.post<AddChainResponse>('/add-chain', payload)
     return data
-  } catch (e: any) {
-    if (e?.response?.status === 404) {
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e) && e.response?.status === 404) {
       try {
         const { data } = await client.post<AddChainResponse>('/chain-proxy', payload)
         return data
-      } catch (e2: any) {
-        if (e2?.response?.status === 404) {
+      } catch (e2: unknown) {
+        if (axios.isAxiosError(e2) && e2.response?.status === 404) {
           throw new Error('后端不支持链式代理接口，请更新 openclash_node_server_stable.py')
         }
         throw e2
@@ -128,4 +149,3 @@ export const addOpenClashChainProxy = async (baseUrl: string, body: AddChainRequ
     throw e
   }
 }
-

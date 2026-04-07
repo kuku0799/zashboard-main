@@ -34,6 +34,10 @@ class ReuseHTTPServer(HTTPServer):
 DEDUP_STRATEGY = "rename"  # "skip" 或 "rename"
 ALLOW_CHINESE_NAMES = True
 LOG_FILE = "/tmp/openclash_node_server.log"
+DEFAULT_SELF_UPDATE_URL = os.environ.get(
+    "OPENCLASH_NODE_SERVER_SELF_UPDATE_URL",
+    "https://raw.githubusercontent.com/kuku0799/zashboard-main/main/openclash_node_server_stable.py",
+).strip()
 
 # 全局变量
 CONFIG_PATH = DEFAULT_CONFIG_PATH
@@ -1946,8 +1950,80 @@ class Handler(BaseHTTPRequestHandler):
             self._handle_delete_nodes()
         elif self.path == "/add-chain" or self.path == "/chain-proxy":
             self._handle_add_chain()
+        elif self.path == "/update-self-script":
+            self._handle_update_self_script()
         else:
             self._send_json(404, {"ok": False, "error": "not found"})
+
+    def _handle_update_self_script(self):
+        """更新当前运行的 openclash_node_server_stable.py 文件（更新后需重启进程生效）"""
+        content_length = int(self.headers.get("Content-Length", 0))
+        body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+
+        try:
+            payload = json.loads(body or "{}")
+        except Exception as e:
+            self._send_json(400, {"ok": False, "error": f"invalid json: {e}"})
+            return
+
+        script_url = str(payload.get("script_url") or DEFAULT_SELF_UPDATE_URL).strip()
+        if not script_url:
+            self._send_json(400, {"ok": False, "error": "script_url is required"})
+            return
+
+        script_path = os.path.abspath(__file__)
+        temp_path = script_path + ".new"
+        backup_path = script_path + ".bak"
+
+        try:
+            write_log(f"开始更新脚本: {script_url}")
+            req = urllib.request.Request(
+                script_url,
+                headers={"User-Agent": "openclash-node-server-updater/1.0"},
+            )
+            with urllib.request.urlopen(req, timeout=25) as resp:
+                code = resp.getcode()
+                if code != 200:
+                    raise RuntimeError(f"下载失败，HTTP {code}")
+                raw = resp.read()
+
+            content = raw.decode("utf-8")
+            if "class Handler" not in content or "def run(" not in content:
+                raise RuntimeError("下载内容校验失败：看起来不是有效脚本")
+
+            with open(temp_path, "w", encoding="utf-8") as f:
+                f.write(content)
+                f.flush()
+                try:
+                    os.fsync(f.fileno())
+                except Exception:
+                    pass
+
+            # 先备份，再原子替换
+            shutil.copy2(script_path, backup_path)
+            os.replace(temp_path, script_path)
+            write_log(f"脚本更新完成: {script_path}（已备份: {backup_path}）")
+
+            self._send_json(
+                200,
+                {
+                    "ok": True,
+                    "updated": True,
+                    "script_url": script_url,
+                    "script_path": script_path,
+                    "backup_path": backup_path,
+                    "need_restart": True,
+                    "message": "脚本已更新，需重启 openclash_node_server_stable.py 进程后生效",
+                },
+            )
+        except Exception as e:
+            try:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+            except Exception:
+                pass
+            write_log(f"更新脚本失败: {e}")
+            self._send_json(500, {"ok": False, "error": str(e)})
     
     def _handle_add_nodes(self):
         """处理添加节点请求"""
