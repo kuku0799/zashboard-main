@@ -31,6 +31,9 @@ const ru: LANG_MESSAGE = {
   restartCoreSuccess: 'Ядро успешно перезапущено',
   reloadConfigsSuccess: 'Конфигурации успешно перезагружены',
   updateGeoSuccess: 'Geo база данных успешно обновлена',
+  updateNodeServerScript: 'Обновить скрипт узлов OpenClash',
+  updateNodeServerScriptSuccess:
+    'Скрипт узлов OpenClash обновлен. Перезапустите node server для применения.',
   chains: 'Цепочки',
   outbound: 'Исходящий',
   sortBy: 'Сортировать по',

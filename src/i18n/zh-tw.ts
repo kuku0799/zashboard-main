@@ -31,6 +31,8 @@ const zhTW: LANG_MESSAGE = {
   restartCoreSuccess: '核心重啟成功',
   reloadConfigsSuccess: '配置重載成功',
   updateGeoSuccess: 'GEO資料庫更新成功',
+  updateNodeServerScript: '更新OpenClash節點腳本',
+  updateNodeServerScriptSuccess: '節點腳本已更新，請重啟 node server 行程後生效',
   chains: '代理鏈',
   outbound: '出站節點',
   sortBy: '排序方式',

@@ -29,6 +29,9 @@ const en = {
   restartCoreSuccess: 'Core restarted successfully',
   reloadConfigsSuccess: 'Configs reloaded successfully',
   updateGeoSuccess: 'Geo database updated successfully',
+  updateNodeServerScript: 'Update OpenClash node script',
+  updateNodeServerScriptSuccess:
+    'OpenClash node script updated. Restart node server process to apply.',
   chains: 'Chains',
   outbound: 'Outbound',
   sortBy: 'Sort by',
@@ -42,9 +45,9 @@ const en = {
   // Connections, proxies, and rules pages
   twoColumnProxyGroup: 'Two-column proxy groups',
   proxiesSimpleView: 'Compact proxy list',
-  proxiesMoreNodes: 'More nodes…',
+  proxiesMoreNodes: 'More nodes?',
   proxiesPickNodeTitle: 'Choose node',
-  proxiesFilterNodes: 'Filter…',
+  proxiesFilterNodes: 'Filter?',
   type: 'Type',
   process: 'Process',
   connectTime: 'Connect time',

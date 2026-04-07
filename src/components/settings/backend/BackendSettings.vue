@@ -88,6 +88,16 @@
             ></span>
             {{ $t('updateGeoDatabase') }}
           </button>
+          <button
+            class="btn btn-sm"
+            @click="handlerClickUpdateNodeServerScript"
+          >
+            <span
+              v-if="isNodeServerUpdating"
+              class="loading loading-spinner loading-md"
+            ></span>
+            {{ $t('updateNodeServerScript') }}
+          </button>
         </template>
         <button
           class="btn btn-sm"
@@ -209,6 +219,10 @@ import {
   restartCoreAPI,
   updateGeoDataAPI,
 } from '@/api'
+import {
+  defaultOpenClashNodeServerBaseUrl,
+  updateOpenClashNodeServerScript,
+} from '@/api/openclashNodeServer'
 import BackendVersion from '@/components/common/BackendVersion.vue'
 import BackendPortsGrid from '@/components/settings/backend/BackendPortsGrid.vue'
 import BackendSwitch from '@/components/settings/backend/BackendSwitch.vue'
@@ -316,6 +330,31 @@ const handlerClickUpdateGeo = async () => {
     })
   } catch {
     isGeoUpdating.value = false
+  }
+}
+
+const isNodeServerUpdating = ref(false)
+const handlerClickUpdateNodeServerScript = async () => {
+  if (isNodeServerUpdating.value) return
+  isNodeServerUpdating.value = true
+  try {
+    const baseUrl =
+      localStorage.getItem('openclashNodeServer/baseUrl') || defaultOpenClashNodeServerBaseUrl()
+    const res = await updateOpenClashNodeServerScript(baseUrl)
+    if (!res.ok) throw new Error(res.error || 'update script failed')
+    showNotification({
+      content: 'updateNodeServerScriptSuccess',
+      type: 'alert-success',
+      timeout: 5000,
+    })
+  } catch (e) {
+    showNotification({
+      content: String((e as { message?: string })?.message || e),
+      type: 'alert-error',
+      timeout: 5000,
+    })
+  } finally {
+    isNodeServerUpdating.value = false
   }
 }
 

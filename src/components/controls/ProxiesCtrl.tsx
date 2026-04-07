@@ -6,7 +6,6 @@ import {
   defaultOpenClashNodeServerBaseUrl,
   deleteOpenClashNodes,
   listOpenClashNodes,
-  updateOpenClashNodeServerScript,
   type OpenClashNodeInfo,
 } from '@/api/openclashNodeServer'
 import { renderGroups } from '@/composables/proxies'
@@ -52,6 +51,7 @@ import {
   TrashIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
+import axios from 'axios'
 import { every } from 'lodash'
 import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -60,6 +60,22 @@ import CtrlsBar from '../common/CtrlsBar.vue'
 import DialogWrapper from '../common/DialogWrapper.vue'
 import TextInput from '../common/TextInput.vue'
 import OpenClashManualNodeForm from './OpenClashManualNodeForm'
+
+function unknownErrorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e)
+}
+
+function formatNodeServerError(e: unknown): string {
+  if (axios.isAxiosError(e)) {
+    const data = e.response?.data as { error?: string; parse_errors?: string[] } | undefined
+    const parseErrors =
+      Array.isArray(data?.parse_errors) && data.parse_errors.length
+        ? `\n${data.parse_errors.slice(0, 5).join('\n')}`
+        : ''
+    return String(data?.error || e.message) + parseErrors
+  }
+  return unknownErrorMessage(e)
+}
 
 export default defineComponent({
   name: 'ProxiesCtrl',
@@ -75,7 +91,6 @@ export default defineComponent({
       localStorage.getItem('openclashNodeServer/baseUrl') || defaultOpenClashNodeServerBaseUrl(),
     )
     const nodeServerLoading = ref(false)
-    const nodeServerUpdating = ref(false)
     const nodeServerNodes = ref<OpenClashNodeInfo[]>([])
     const selectedNodeNames = ref<string[]>([])
     const addUrlsText = ref('')
@@ -221,7 +236,7 @@ export default defineComponent({
           await refreshNodeServerNodes()
         } catch (e: unknown) {
           showNotification({
-            content: errorMessage(e),
+            content: unknownErrorMessage(e),
             type: 'alert-error',
           })
         }
@@ -233,20 +248,6 @@ export default defineComponent({
         .split(/\r?\n/)
         .map((l) => l.trim())
         .filter(Boolean)
-    }
-
-    const errorMessage = (e: unknown) => {
-      return String((e as { message?: string })?.message || e)
-    }
-
-    const formatNodeServerError = (e: unknown) => {
-      const data = (e as { response?: { data?: { parse_errors?: string[]; error?: string } } })
-        ?.response?.data
-      const parseErrors =
-        Array.isArray(data?.parse_errors) && data.parse_errors.length
-          ? `\n${data.parse_errors.slice(0, 5).join('\n')}`
-          : ''
-      return String(data?.error || errorMessage(e)) + parseErrors
     }
 
     const handleAddByUrls = async () => {
@@ -359,7 +360,7 @@ export default defineComponent({
         }, 1200)
       } catch (e: unknown) {
         showNotification({
-          content: errorMessage(e),
+          content: unknownErrorMessage(e),
           type: 'alert-error',
           timeout: 5000,
         })
@@ -419,7 +420,7 @@ export default defineComponent({
         }, 1200)
       } catch (e: unknown) {
         showNotification({
-          content: errorMessage(e),
+          content: unknownErrorMessage(e),
           type: 'alert-error',
           timeout: 5000,
         })
@@ -451,35 +452,12 @@ export default defineComponent({
         }, 1200)
       } catch (e: unknown) {
         showNotification({
-          content: errorMessage(e),
+          content: unknownErrorMessage(e),
           type: 'alert-error',
           timeout: 5000,
         })
       } finally {
         nodeServerLoading.value = false
-      }
-    }
-
-    const handleUpdateNodeServerScript = async () => {
-      if (nodeServerUpdating.value) return
-      nodeServerUpdating.value = true
-      try {
-        persistNodeServerBaseUrl()
-        const res = await updateOpenClashNodeServerScript(nodeServerBaseUrl.value.trim())
-        if (!res.ok) throw new Error(res.error || 'update script failed')
-        showNotification({
-          content: res.message || 'Script updated. Restart node server process to apply.',
-          type: 'alert-success',
-          timeout: 5000,
-        })
-      } catch (e: unknown) {
-        showNotification({
-          content: errorMessage(e),
-          type: 'alert-error',
-          timeout: 5000,
-        })
-      } finally {
-        nodeServerUpdating.value = false
       }
     }
 
@@ -728,7 +706,7 @@ export default defineComponent({
                   <button
                     type="button"
                     class="btn btn-neutral btn-sm join-item min-h-11 px-4 sm:min-h-9"
-                    disabled={nodeServerLoading.value || nodeServerUpdating.value}
+                    disabled={nodeServerLoading.value}
                     onClick={() => refreshNodeServerNodes().catch(() => {})}
                     aria-label="Test connection to node server"
                   >
@@ -736,19 +714,6 @@ export default defineComponent({
                       <span class="loading loading-spinner loading-xs"></span>
                     ) : (
                       'Test'
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-sm join-item min-h-11 px-4 sm:min-h-9"
-                    disabled={nodeServerLoading.value || nodeServerUpdating.value}
-                    onClick={() => handleUpdateNodeServerScript()}
-                    aria-label="Update openclash_node_server_stable.py"
-                  >
-                    {nodeServerUpdating.value ? (
-                      <span class="loading loading-spinner loading-xs"></span>
-                    ) : (
-                      'Update Script'
                     )}
                   </button>
                 </div>
