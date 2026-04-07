@@ -82,7 +82,7 @@ export const mihomo = computed<[MIHOMO, string] | undefined>(() => {
   }
 })
 export const zashboardVersion = ref(__APP_VERSION__)
-const uiReleaseRepo = import.meta.env.VITE_UI_RELEASE_REPO || 'Zephyruso/zashboard'
+const uiReleaseRepo = import.meta.env.VITE_UI_RELEASE_REPO || 'kuku0799/zashboard-main'
 export const uiReleaseRepoUrl = `https://github.com/${uiReleaseRepo}`
 const uiReleaseLatestApi = `https://api.github.com/repos/${uiReleaseRepo}/releases/latest`
 
