@@ -1,0 +1,1787 @@
+#------------------锚点复用---------------
+#已写入防止dns泄露
+#多ip指定
+#meta核心
+proxy-providers-dingyue: &airports
+
+  gfwairport5:
+    type: http
+    interval: 3600
+    path: ./gfwairport5.yaml
+    url:  #此处填入机场订阅URL
+    exclude-filter: "-10倍|剩余流量|套餐到期"
+    health-check:
+      enable: true
+      url: https://www.google.com/generate_204
+      interval: 900
+      lazy: true
+
+
+proxy-providers-config:
+  proxy-providers-use:
+  - gfwairport5
+
+port: 7890
+socks-port: 7891
+allow-lan: true
+mode: rule
+log-level: info
+external-controller: :9090
+ipv6: true
+geo-auto-update: true
+geo-update-interval: 24
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
+experimental:
+  ignore-resolve-fail: true
+dns:
+  enable: true
+  prefer-h3: true
+  listen: 0.0.0.0:53
+  ipv6: true
+  cache:
+    size: 4096
+    prefetch: true
+    expire: 3600
+
+  default-nameserver:
+  - 1.1.1.1
+  - 8.8.8.8
+  - 9.9.9.9
+  - 208.67.222.222
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:  # 指定不适用 fake-ip 的域名（防止订阅域名被 fake-ip）
+    - '*.lan'
+    - '*.local'
+    - 'sub.huli168.com'
+    - '+.huli168.com'
+  #nameserver-policy:  #为以下域名指定DNS服务器
+    #'www.baidu.com': '114.114.114.114'
+    #'+.internal.crop.com': '10.0.0.1'
+    #'geosite:cn': https://doh.pub/dns-query
+  nameserver:
+  - https://cloudflare-dns.com/dns-query
+  - https://dns.google/dns-query
+  - https://dns.quad9.net/dns-query
+  - tls://1.1.1.1:853
+  - tls://8.8.8.8:853
+  fallback:
+  - https://doh.dns.sb/dns-query
+  - https://dns.cloudflare.com/dns-query
+  - https://dns.google/dns-query
+  - https://dns.quad9.net/dns-query
+  - https://dns.twnic.tw/dns-query
+  proxy-server-nameserver:   #代理节点域名解析服务器，仅用于解析代理节点的域名
+  - https://dns.cloudflare.com/dns-query
+  - https://dns.google/dns-query
+  - https://dns.quad9.net/dns-query
+  - https://doh.dns.sb/dns-query
+  - https://dns.twnic.tw/dns-query
+  - 1.1.1.1
+  - 8.8.8.8
+  fallback-filter:
+    geoip: false
+    geoip-code: CN
+    geosite:
+    - gfw
+    ipcidr:
+    - 240.0.0.0/4
+    domain:  #以下域名只使用fallback请求IP
+    #这些域名被视为已污染，匹配到这些域名，会直接使用 fallback解析，不去使用 nameserver
+    - '+.google.com'
+    - '+.googlesyndication.com'
+    - '+.facebook.com'
+    - '+.youtube.com'
+    - '+.x.com'
+    - '+.apple.com'
+    - '+.javbus22.com'
+    - '+.jads.co'
+    - '+.api.io.mi.com'
+    - '+.icloud.com'
+    - '+.lnaspiring.com'
+    - '+.cloudflare.com'
+    - '+.coo.wiki'
+    - '+.ip.sb'
+    - '+.doubleclick.net'
+    - '+.amazonaws.com'
+    - '+.cloudfront.net'
+    - '+.openwrt.org'
+    - '+.googleadservices.com'
+    - '+.koolcenter.com'
+    - '+.ghproxy.com'
+    - '+.knjc.cfd'
+    - '+.xiaoya.pro'
+    - '+.lwjyj.com'
+    - '+.vpdmm.cc'
+    - '+.ac.jp'
+    - '+.my-netdata.io'
+    - '+.appcenter.ms'
+    - 'vl.justloli.cn'
+    - '3kloli.justloli.cn'
+    - '+.hotloli.cloudns.org'
+
+
+  experimental:
+    ignore-resolve-fail: true
+
+
+
+proxy-providers: *airports
+
+pr:
+  proxies:  #这里添加节点名称
+proxies:   [] #节点添加到这里
+
+
+proxy-groups:
+
+- name: 手机2
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机3
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机4
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机5
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机6
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机7
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机8
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机9
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机10
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机11
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机12
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机13
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机14
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机15
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机16
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机17
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机18
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机19
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机20
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机21
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机22
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机23
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机24
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机25
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机26
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机27
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机28
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机29
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机30
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机31
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机32
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机33
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机34
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机35
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机36
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机37
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机38
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机39
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机40
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机41
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机42
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机43
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机44
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机45
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机46
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机47
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机48
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机49
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机50
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机51
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机52
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机53
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机54
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机55
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机56
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机57
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机58
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机59
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机60
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机61
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机62
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机63
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机64
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机65
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机66
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机67
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机68
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机69
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机70
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机71
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机72
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机73
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机74
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机75
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机76
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机77
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机78
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机79
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机80
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机81
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机82
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机83
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机84
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机85
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机86
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机87
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机88
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机89
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机90
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机91
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机92
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机93
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机94
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机95
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机96
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机97
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机98
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机99
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机100
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机101
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机102
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机103
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机104
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机105
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机106
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机107
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机108
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机109
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机110
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机111
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机112
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机113
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机114
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机115
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机116
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机117
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机118
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机119
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机120
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机121
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机122
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机123
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机124
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机125
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机126
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机127
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机128
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机129
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机130
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机131
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机132
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机133
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机134
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机135
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机136
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机137
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机138
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机139
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机140
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机141
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机142
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机143
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机144
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机145
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机146
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机147
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机148
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机149
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机150
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机151
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机152
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机153
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机154
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机155
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机156
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机157
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机158
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机159
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机160
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机161
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机162
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机163
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机164
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机165
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机166
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机167
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机168
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机169
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机170
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机171
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机172
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机173
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机174
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机175
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机176
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机177
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机178
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机179
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机180
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机181
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机182
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机183
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机184
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机185
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机186
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机187
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机188
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机189
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机190
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机191
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机192
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机193
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机194
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机195
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机196
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机197
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机198
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机199
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机200
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机201
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机202
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机203
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机204
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机205
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机206
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机207
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机208
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机209
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机210
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机211
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机212
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机213
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机214
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机215
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机216
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机217
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机218
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机219
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机220
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机221
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机222
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机223
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机224
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机225
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机226
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机227
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机228
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机229
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机230
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机231
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机232
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机233
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机234
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机235
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机236
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机237
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机238
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机239
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机240
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机241
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机242
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机243
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机244
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机245
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机246
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机247
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机248
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机249
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机250
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机251
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机252
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机253
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 手机254
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🚀 节点选择
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🚀 手动切换
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🎯 全球直连
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🛑 广告拦截
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🍃 应用净化
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🐟 漏网之鱼
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+rules:
+- SRC-IP-CIDR,192.168.5.2/32,手机2
+- SRC-IP-CIDR,192.168.5.3/32,手机3
+- SRC-IP-CIDR,192.168.5.4/32,手机4
+- SRC-IP-CIDR,192.168.5.5/32,手机5
+- SRC-IP-CIDR,192.168.5.6/32,手机6
+- SRC-IP-CIDR,192.168.5.7/32,手机7
+- SRC-IP-CIDR,192.168.5.8/32,手机8
+- SRC-IP-CIDR,192.168.5.9/32,手机9
+- SRC-IP-CIDR,192.168.5.10/32,手机10
+- SRC-IP-CIDR,192.168.5.11/32,手机11
+- SRC-IP-CIDR,192.168.5.12/32,手机12
+- SRC-IP-CIDR,192.168.5.13/32,手机13
+- SRC-IP-CIDR,192.168.5.14/32,手机14
+- SRC-IP-CIDR,192.168.5.15/32,手机15
+- SRC-IP-CIDR,192.168.5.16/32,手机16
+- SRC-IP-CIDR,192.168.5.17/32,手机17
+- SRC-IP-CIDR,192.168.5.18/32,手机18
+- SRC-IP-CIDR,192.168.5.19/32,手机19
+- SRC-IP-CIDR,192.168.5.20/32,手机20
+- SRC-IP-CIDR,192.168.5.21/32,手机21
+- SRC-IP-CIDR,192.168.5.22/32,手机22
+- SRC-IP-CIDR,192.168.5.23/32,手机23
+- SRC-IP-CIDR,192.168.5.24/32,手机24
+- SRC-IP-CIDR,192.168.5.25/32,手机25
+- SRC-IP-CIDR,192.168.5.26/32,手机26
+- SRC-IP-CIDR,192.168.5.27/32,手机27
+- SRC-IP-CIDR,192.168.5.28/32,手机28
+- SRC-IP-CIDR,192.168.5.29/32,手机29
+- SRC-IP-CIDR,192.168.5.30/32,手机30
+- SRC-IP-CIDR,192.168.5.31/32,手机31
+- SRC-IP-CIDR,192.168.5.32/32,手机32
+- SRC-IP-CIDR,192.168.5.33/32,手机33
+- SRC-IP-CIDR,192.168.5.34/32,手机34
+- SRC-IP-CIDR,192.168.5.35/32,手机35
+- SRC-IP-CIDR,192.168.5.36/32,手机36
+- SRC-IP-CIDR,192.168.5.37/32,手机37
+- SRC-IP-CIDR,192.168.5.38/32,手机38
+- SRC-IP-CIDR,192.168.5.39/32,手机39
+- SRC-IP-CIDR,192.168.5.40/32,手机40
+- SRC-IP-CIDR,192.168.5.41/32,手机41
+- SRC-IP-CIDR,192.168.5.42/32,手机42
+- SRC-IP-CIDR,192.168.5.43/32,手机43
+- SRC-IP-CIDR,192.168.5.44/32,手机44
+- SRC-IP-CIDR,192.168.5.45/32,手机45
+- SRC-IP-CIDR,192.168.5.46/32,手机46
+- SRC-IP-CIDR,192.168.5.47/32,手机47
+- SRC-IP-CIDR,192.168.5.48/32,手机48
+- SRC-IP-CIDR,192.168.5.49/32,手机49
+- SRC-IP-CIDR,192.168.5.50/32,手机50
+- SRC-IP-CIDR,192.168.5.51/32,手机51
+- SRC-IP-CIDR,192.168.5.52/32,手机52
+- SRC-IP-CIDR,192.168.5.53/32,手机53
+- SRC-IP-CIDR,192.168.5.54/32,手机54
+- SRC-IP-CIDR,192.168.5.55/32,手机55
+- SRC-IP-CIDR,192.168.5.56/32,手机56
+- SRC-IP-CIDR,192.168.5.57/32,手机57
+- SRC-IP-CIDR,192.168.5.58/32,手机58
+- SRC-IP-CIDR,192.168.5.59/32,手机59
+- SRC-IP-CIDR,192.168.5.60/32,手机60
+- SRC-IP-CIDR,192.168.5.61/32,手机61
+- SRC-IP-CIDR,192.168.5.62/32,手机62
+- SRC-IP-CIDR,192.168.5.63/32,手机63
+- SRC-IP-CIDR,192.168.5.64/32,手机64
+- SRC-IP-CIDR,192.168.5.65/32,手机65
+- SRC-IP-CIDR,192.168.5.66/32,手机66
+- SRC-IP-CIDR,192.168.5.67/32,手机67
+- SRC-IP-CIDR,192.168.5.68/32,手机68
+- SRC-IP-CIDR,192.168.5.69/32,手机69
+- SRC-IP-CIDR,192.168.5.70/32,手机70
+- SRC-IP-CIDR,192.168.5.71/32,手机71
+- SRC-IP-CIDR,192.168.5.72/32,手机72
+- SRC-IP-CIDR,192.168.5.73/32,手机73
+- SRC-IP-CIDR,192.168.5.74/32,手机74
+- SRC-IP-CIDR,192.168.5.75/32,手机75
+- SRC-IP-CIDR,192.168.5.76/32,手机76
+- SRC-IP-CIDR,192.168.5.77/32,手机77
+- SRC-IP-CIDR,192.168.5.78/32,手机78
+- SRC-IP-CIDR,192.168.5.79/32,手机79
+- SRC-IP-CIDR,192.168.5.80/32,手机80
+- SRC-IP-CIDR,192.168.5.81/32,手机81
+- SRC-IP-CIDR,192.168.5.82/32,手机82
+- SRC-IP-CIDR,192.168.5.83/32,手机83
+- SRC-IP-CIDR,192.168.5.84/32,手机84
+- SRC-IP-CIDR,192.168.5.85/32,手机85
+- SRC-IP-CIDR,192.168.5.86/32,手机86
+- SRC-IP-CIDR,192.168.5.87/32,手机87
+- SRC-IP-CIDR,192.168.5.88/32,手机88
+- SRC-IP-CIDR,192.168.5.89/32,手机89
+- SRC-IP-CIDR,192.168.5.90/32,手机90
+- SRC-IP-CIDR,192.168.5.91/32,手机91
+- SRC-IP-CIDR,192.168.5.92/32,手机92
+- SRC-IP-CIDR,192.168.5.93/32,手机93
+- SRC-IP-CIDR,192.168.5.94/32,手机94
+- SRC-IP-CIDR,192.168.5.95/32,手机95
+- SRC-IP-CIDR,192.168.5.96/32,手机96
+- SRC-IP-CIDR,192.168.5.97/32,手机97
+- SRC-IP-CIDR,192.168.5.98/32,手机98
+- SRC-IP-CIDR,192.168.5.99/32,手机99
+- SRC-IP-CIDR,192.168.5.100/32,手机100
+- SRC-IP-CIDR,192.168.5.101/32,手机101
+- SRC-IP-CIDR,192.168.5.102/32,手机102
+- SRC-IP-CIDR,192.168.5.103/32,手机103
+- SRC-IP-CIDR,192.168.5.104/32,手机104
+- SRC-IP-CIDR,192.168.5.105/32,手机105
+- SRC-IP-CIDR,192.168.5.106/32,手机106
+- SRC-IP-CIDR,192.168.5.107/32,手机107
+- SRC-IP-CIDR,192.168.5.108/32,手机108
+- SRC-IP-CIDR,192.168.5.109/32,手机109
+- SRC-IP-CIDR,192.168.5.110/32,手机110
+- SRC-IP-CIDR,192.168.5.111/32,手机111
+- SRC-IP-CIDR,192.168.5.112/32,手机112
+- SRC-IP-CIDR,192.168.5.113/32,手机113
+- SRC-IP-CIDR,192.168.5.114/32,手机114
+- SRC-IP-CIDR,192.168.5.115/32,手机115
+- SRC-IP-CIDR,192.168.5.116/32,手机116
+- SRC-IP-CIDR,192.168.5.117/32,手机117
+- SRC-IP-CIDR,192.168.5.118/32,手机118
+- SRC-IP-CIDR,192.168.5.119/32,手机119
+- SRC-IP-CIDR,192.168.5.120/32,手机120
+- SRC-IP-CIDR,192.168.5.121/32,手机121
+- SRC-IP-CIDR,192.168.5.122/32,手机122
+- SRC-IP-CIDR,192.168.5.123/32,手机123
+- SRC-IP-CIDR,192.168.5.124/32,手机124
+- SRC-IP-CIDR,192.168.5.125/32,手机125
+- SRC-IP-CIDR,192.168.5.126/32,手机126
+- SRC-IP-CIDR,192.168.5.127/32,手机127
+- SRC-IP-CIDR,192.168.5.128/32,手机128
+- SRC-IP-CIDR,192.168.5.129/32,手机129
+- SRC-IP-CIDR,192.168.5.130/32,手机130
+- SRC-IP-CIDR,192.168.5.131/32,手机131
+- SRC-IP-CIDR,192.168.5.132/32,手机132
+- SRC-IP-CIDR,192.168.5.133/32,手机133
+- SRC-IP-CIDR,192.168.5.134/32,手机134
+- SRC-IP-CIDR,192.168.5.135/32,手机135
+- SRC-IP-CIDR,192.168.5.136/32,手机136
+- SRC-IP-CIDR,192.168.5.137/32,手机137
+- SRC-IP-CIDR,192.168.5.138/32,手机138
+- SRC-IP-CIDR,192.168.5.139/32,手机139
+- SRC-IP-CIDR,192.168.5.140/32,手机140
+- SRC-IP-CIDR,192.168.5.141/32,手机141
+- SRC-IP-CIDR,192.168.5.142/32,手机142
+- SRC-IP-CIDR,192.168.5.143/32,手机143
+- SRC-IP-CIDR,192.168.5.144/32,手机144
+- SRC-IP-CIDR,192.168.5.145/32,手机145
+- SRC-IP-CIDR,192.168.5.146/32,手机146
+- SRC-IP-CIDR,192.168.5.147/32,手机147
+- SRC-IP-CIDR,192.168.5.148/32,手机148
+- SRC-IP-CIDR,192.168.5.149/32,手机149
+- SRC-IP-CIDR,192.168.5.150/32,手机150
+- SRC-IP-CIDR,192.168.5.151/32,手机151
+- SRC-IP-CIDR,192.168.5.152/32,手机152
+- SRC-IP-CIDR,192.168.5.153/32,手机153
+- SRC-IP-CIDR,192.168.5.154/32,手机154
+- SRC-IP-CIDR,192.168.5.155/32,手机155
+- SRC-IP-CIDR,192.168.5.156/32,手机156
+- SRC-IP-CIDR,192.168.5.157/32,手机157
+- SRC-IP-CIDR,192.168.5.158/32,手机158
+- SRC-IP-CIDR,192.168.5.159/32,手机159
+- SRC-IP-CIDR,192.168.5.160/32,手机160
+- SRC-IP-CIDR,192.168.5.161/32,手机161
+- SRC-IP-CIDR,192.168.5.162/32,手机162
+- SRC-IP-CIDR,192.168.5.163/32,手机163
+- SRC-IP-CIDR,192.168.5.164/32,手机164
+- SRC-IP-CIDR,192.168.5.165/32,手机165
+- SRC-IP-CIDR,192.168.5.166/32,手机166
+- SRC-IP-CIDR,192.168.5.167/32,手机167
+- SRC-IP-CIDR,192.168.5.168/32,手机168
+- SRC-IP-CIDR,192.168.5.169/32,手机169
+- SRC-IP-CIDR,192.168.5.170/32,手机170
+- SRC-IP-CIDR,192.168.5.171/32,手机171
+- SRC-IP-CIDR,192.168.5.172/32,手机172
+- SRC-IP-CIDR,192.168.5.173/32,手机173
+- SRC-IP-CIDR,192.168.5.174/32,手机174
+- SRC-IP-CIDR,192.168.5.175/32,手机175
+- SRC-IP-CIDR,192.168.5.176/32,手机176
+- SRC-IP-CIDR,192.168.5.177/32,手机177
+- SRC-IP-CIDR,192.168.5.178/32,手机178
+- SRC-IP-CIDR,192.168.5.179/32,手机179
+- SRC-IP-CIDR,192.168.5.180/32,手机180
+- SRC-IP-CIDR,192.168.5.181/32,手机181
+- SRC-IP-CIDR,192.168.5.182/32,手机182
+- SRC-IP-CIDR,192.168.5.183/32,手机183
+- SRC-IP-CIDR,192.168.5.184/32,手机184
+- SRC-IP-CIDR,192.168.5.185/32,手机185
+- SRC-IP-CIDR,192.168.5.186/32,手机186
+- SRC-IP-CIDR,192.168.5.187/32,手机187
+- SRC-IP-CIDR,192.168.5.188/32,手机188
+- SRC-IP-CIDR,192.168.5.189/32,手机189
+- SRC-IP-CIDR,192.168.5.190/32,手机190
+- SRC-IP-CIDR,192.168.5.191/32,手机191
+- SRC-IP-CIDR,192.168.5.192/32,手机192
+- SRC-IP-CIDR,192.168.5.193/32,手机193
+- SRC-IP-CIDR,192.168.5.194/32,手机194
+- SRC-IP-CIDR,192.168.5.195/32,手机195
+- SRC-IP-CIDR,192.168.5.196/32,手机196
+- SRC-IP-CIDR,192.168.5.197/32,手机197
+- SRC-IP-CIDR,192.168.5.198/32,手机198
+- SRC-IP-CIDR,192.168.5.199/32,手机199
+- SRC-IP-CIDR,192.168.5.200/32,手机200
+- SRC-IP-CIDR,192.168.5.201/32,手机201
+- SRC-IP-CIDR,192.168.5.202/32,手机202
+- SRC-IP-CIDR,192.168.5.203/32,手机203
+- SRC-IP-CIDR,192.168.5.204/32,手机204
+- SRC-IP-CIDR,192.168.5.205/32,手机205
+- SRC-IP-CIDR,192.168.5.206/32,手机206
+- SRC-IP-CIDR,192.168.5.207/32,手机207
+- SRC-IP-CIDR,192.168.5.208/32,手机208
+- SRC-IP-CIDR,192.168.5.209/32,手机209
+- SRC-IP-CIDR,192.168.5.210/32,手机210
+- SRC-IP-CIDR,192.168.5.211/32,手机211
+- SRC-IP-CIDR,192.168.5.212/32,手机212
+- SRC-IP-CIDR,192.168.5.213/32,手机213
+- SRC-IP-CIDR,192.168.5.214/32,手机214
+- SRC-IP-CIDR,192.168.5.215/32,手机215
+- SRC-IP-CIDR,192.168.5.216/32,手机216
+- SRC-IP-CIDR,192.168.5.217/32,手机217
+- SRC-IP-CIDR,192.168.5.218/32,手机218
+- SRC-IP-CIDR,192.168.5.219/32,手机219
+- SRC-IP-CIDR,192.168.5.220/32,手机220
+- SRC-IP-CIDR,192.168.5.221/32,手机221
+- SRC-IP-CIDR,192.168.5.222/32,手机222
+- SRC-IP-CIDR,192.168.5.223/32,手机223
+- SRC-IP-CIDR,192.168.5.224/32,手机224
+- SRC-IP-CIDR,192.168.5.225/32,手机225
+- SRC-IP-CIDR,192.168.5.226/32,手机226
+- SRC-IP-CIDR,192.168.5.227/32,手机227
+- SRC-IP-CIDR,192.168.5.228/32,手机228
+- SRC-IP-CIDR,192.168.5.229/32,手机229
+- SRC-IP-CIDR,192.168.5.230/32,手机230
+- SRC-IP-CIDR,192.168.5.231/32,手机231
+- SRC-IP-CIDR,192.168.5.232/32,手机232
+- SRC-IP-CIDR,192.168.5.233/32,手机233
+- SRC-IP-CIDR,192.168.5.234/32,手机234
+- SRC-IP-CIDR,192.168.5.235/32,手机235
+- SRC-IP-CIDR,192.168.5.236/32,手机236
+- SRC-IP-CIDR,192.168.5.237/32,手机237
+- SRC-IP-CIDR,192.168.5.238/32,手机238
+- SRC-IP-CIDR,192.168.5.239/32,手机239
+- SRC-IP-CIDR,192.168.5.240/32,手机240
+- SRC-IP-CIDR,192.168.5.241/32,手机241
+- SRC-IP-CIDR,192.168.5.242/32,手机242
+- SRC-IP-CIDR,192.168.5.243/32,手机243
+- SRC-IP-CIDR,192.168.5.244/32,手机244
+- SRC-IP-CIDR,192.168.5.245/32,手机245
+- SRC-IP-CIDR,192.168.5.246/32,手机246
+- SRC-IP-CIDR,192.168.5.247/32,手机247
+- SRC-IP-CIDR,192.168.5.248/32,手机248
+- SRC-IP-CIDR,192.168.5.249/32,手机249
+- SRC-IP-CIDR,192.168.5.250/32,手机250
+- SRC-IP-CIDR,192.168.5.251/32,手机251
+- SRC-IP-CIDR,192.168.5.252/32,手机252
+- SRC-IP-CIDR,192.168.5.253/32,手机253
+- SRC-IP-CIDR,192.168.5.254/32,手机254
+- RULE-SET,LocalAreaNetwork,🎯 全球直连
+- RULE-SET,UnBan,🎯 全球直连
+- RULE-SET,BanAD,🛑 广告拦截
+- RULE-SET,BanProgramAD,🍃 应用净化
+- RULE-SET,GoogleCN,🎯 全球直连
+- RULE-SET,SteamCN,🎯 全球直连
+- RULE-SET,ProxyGFWlist,🚀 节点选择
+- RULE-SET,ChinaDomain,🎯 全球直连
+- RULE-SET,ChinaCompanyIp,🎯 全球直连,no-resolve
+- RULE-SET,Download,🎯 全球直连
+- RULE-SET,GoogleCNProxyIP,🚀 节点选择,no-resolve
+- RULE-SET,ChinaIp,🎯 全球直连,no-resolve
+- GEOSITE,cn,DIRECT
+- GEOIP,CN,🎯 全球直连,no-resolve
+- MATCH,🐟 漏网之鱼
+
+rule-providers:
+  LocalAreaNetwork:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvTG9jYWxBcmVhTmV0d29yay5saXN0
+    path: ./providers/rule-provider_LocalAreaNetwork.yaml
+    interval: 86400
+  UnBan:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVW5CYW4ubGlzdA
+    path: ./providers/rule-provider_UnBan.yaml
+    interval: 86400
+  BanAD:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA
+    path: ./providers/rule-provider_BanAD.yaml
+    interval: 86400
+  BanProgramAD:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q
+    path: ./providers/rule-provider_BanProgramAD.yaml
+    interval: 86400
+  GoogleFCM:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9Hb29nbGVGQ00ubGlzdA
+    path: ./providers/rule-provider_GoogleFCM.yaml
+    interval: 86400
+  GoogleCN:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvR29vZ2xlQ04ubGlzdA
+    path: ./providers/rule-provider_GoogleCN.yaml
+    interval: 86400
+  SteamCN:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9TdGVhbUNOLmxpc3Q
+    path: ./providers/rule-provider_SteamCN.yaml
+    interval: 86400
+
+  ProxyGFWlist:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q
+    path: ./providers/rule-provider_ProxyGFWlist.yaml
+    interval: 86400
+  ChinaDomain:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA
+    path: ./providers/rule-provider_ChinaDomain.yaml
+    interval: 86400
+  ChinaCompanyIp:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFDb21wYW55SXAubGlzdA
+    path: ./providers/rule-provider_ChinaCompanyIp.yaml
+    interval: 86400
+  Download:
+    type: http
+    behavior: classical
+    url: https://api.dler.io/getruleset?type=6&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvRG93bmxvYWQubGlzdA
+    path: ./providers/rule-provider_Download.yaml
+    interval: 86400
+  GoogleCNProxyIP:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/GoogleCNProxyIP.yaml
+    path: ./providers/rule-provider_GoogleCNProxyIP.yaml
+    interval: 86400
+
+  ChinaIp:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/ChinaIp.yaml
+    path: ./providers/rule-provider_ChinaIp.yaml
+    interval: 86400
+
